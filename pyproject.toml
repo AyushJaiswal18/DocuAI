@@ -1,0 +1,49 @@
+[project]
+name = "docuai"
+version = "0.1.0"
+description = "AI-powered code documentation generator"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Ayush", email = "ayush@example.com"},
+]
+keywords = ["documentation", "ai", "code-analysis", "ast", "openai", "langchain"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Documentation",
+    "Topic :: Software Development :: Quality Assurance",
+]
+dependencies = [
+    "langchain>=0.1.0",
+    "langchain-openai>=0.0.5",
+    "typer>=0.9.0",
+    "python-dotenv>=1.0.0",
+    "esprima>=4.0.1",
+    "rich>=13.0.0",
+]
+requires-python = ">=3.9"
+
+[project.urls]
+Homepage = "https://github.com/yourusername/docuai"
+Repository = "https://github.com/yourusername/docuai"
+Issues = "https://github.com/yourusername/docuai/issues"
+
+[project.optional-dependencies]
+dev = [
+    "build",
+    "twine",
+]
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project.scripts]
+docuai = "docuai.cli:app"
