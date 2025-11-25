@@ -15,10 +15,10 @@ console = Console()
 def get_parser(file_path: str):
     if file_path.endswith(".py"):
         return PythonParser()
-    elif file_path.endswith(".js"):
+    elif file_path.endswith((".js", ".jsx", ".ts", ".tsx")):
         return JSParser()
     else:
-        raise ValueError("Unsupported file type")
+        raise ValueError(f"Unsupported file type: {file_path}")
 
 def process_file_generate(file_path: str, output: str = None, agent: DocuAIAgent = None):
     try:
@@ -29,30 +29,42 @@ def process_file_generate(file_path: str, output: str = None, agent: DocuAIAgent
         console.print(f"[bold green]Generating documentation for {os.path.basename(file_path)}...[/bold green]")
         docs = agent.generate_docs(metadata)
         
+        # Auto-save to .md file
         if output:
             # If output is a directory, save file there
             if os.path.isdir(output):
                 out_path = os.path.join(output, os.path.basename(file_path) + ".md")
             else:
                 out_path = output
-                
-            with open(out_path, "w") as f:
-                f.write(docs)
-            console.print(f"[bold blue]Documentation saved to {out_path}[/bold blue]")
         else:
-            console.print(docs)
-            console.print("-" * 40)
+            # Auto-generate filename
+            base_name = os.path.splitext(os.path.basename(file_path))[0]
+            out_path = f"{base_name}_docs.md"
+            
+        with open(out_path, "w") as f:
+            f.write(docs)
+        console.print(f"[bold blue]✓ Documentation saved to {out_path}[/bold blue]")
             
     except Exception as e:
         console.print(f"[bold red]Error processing {file_path}: {e}[/bold red]")
 
-def process_file_analyze(file_path: str, agent: DocuAIAgent = None):
+def process_file_analyze(file_path: str, output: str = None, agent: DocuAIAgent = None):
     try:
         console.print(f"[bold green]Analyzing {file_path}...[/bold green]")
         analysis = agent.analyze_code(file_path)
-        console.print(f"[bold blue]Analysis for {os.path.basename(file_path)}:[/bold blue]")
-        console.print(analysis)
-        console.print("-" * 40)
+        
+        # Auto-save to .md file
+        if output:
+            out_path = output
+        else:
+            # Auto-generate filename
+            base_name = os.path.splitext(os.path.basename(file_path))[0]
+            out_path = f"{base_name}_analysis.md"
+            
+        with open(out_path, "w") as f:
+            f.write(f"# Code Analysis: {os.path.basename(file_path)}\n\n")
+            f.write(analysis)
+        console.print(f"[bold blue]✓ Analysis saved to {out_path}[/bold blue]")
             
     except Exception as e:
         console.print(f"[bold red]Error analyzing {file_path}: {e}[/bold red]")
@@ -98,12 +110,17 @@ def generate(input_path: str, output: str = None):
         console.print("[bold green]Generating repository documentation...[/bold green]")
         docs = agent.generate_repo_docs(metadata_list)
         
+        # Auto-save repo docs
         if output:
-            with open(output, "w") as f:
-                f.write(docs)
-            console.print(f"[bold blue]Documentation saved to {output}[/bold blue]")
+            out_path = output
         else:
-            console.print(docs)
+            # Auto-generate filename based on directory name
+            dir_name = os.path.basename(os.path.abspath(input_path if not temp_dir else temp_dir))
+            out_path = f"{dir_name}_documentation.md"
+            
+        with open(out_path, "w") as f:
+            f.write(docs)
+        console.print(f"[bold blue]✓ Documentation saved to {out_path}[/bold blue]")
             
     except Exception as e:
         console.print(f"[bold red]Error: {e}[/bold red]")
@@ -113,7 +130,7 @@ def generate(input_path: str, output: str = None):
             console.print("[bold yellow]Repository cleaned up.[/bold yellow]")
 
 @app.command()
-def analyze(input_path: str):
+def analyze(input_path: str, output: str = None):
     """
     Analyze code for smells and improvements.
     """
@@ -133,7 +150,7 @@ def analyze(input_path: str):
             files = list(get_repo_files(input_path))
         else:
             # Single file processing
-            process_file_analyze(input_path, agent)
+            process_file_analyze(input_path, output, agent)
             return
 
         # Repo/Dir processing
@@ -143,7 +160,19 @@ def analyze(input_path: str):
 
         console.print(f"[bold green]Analyzing {len(files)} files...[/bold green]")
         analysis = agent.analyze_repo(files)
-        console.print(analysis)
+        
+        # Auto-save repo analysis
+        if output:
+            out_path = output
+        else:
+            # Auto-generate filename based on directory name
+            dir_name = os.path.basename(os.path.abspath(input_path if not temp_dir else temp_dir))
+            out_path = f"{dir_name}_analysis.md"
+            
+        with open(out_path, "w") as f:
+            f.write(f"# Code Analysis Report\n\n")
+            f.write(analysis)
+        console.print(f"[bold blue]✓ Analysis saved to {out_path}[/bold blue]")
             
     except Exception as e:
         console.print(f"[bold red]Error: {e}[/bold red]")

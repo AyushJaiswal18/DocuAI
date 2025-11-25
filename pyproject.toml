@@ -1,6 +1,6 @@
 [project]
 name = "docuai"
-version = "0.1.0"
+version = "0.2.1"
 description = "AI-powered code documentation generator"
 readme = "README.md"
 license = {text = "MIT"}
@@ -31,9 +31,9 @@ dependencies = [
 requires-python = ">=3.9"
 
 [project.urls]
-Homepage = "https://github.com/yourusername/docuai"
-Repository = "https://github.com/yourusername/docuai"
-Issues = "https://github.com/yourusername/docuai/issues"
+Homepage = "https://github.com/AyushJaiswal18/DocuAI"
+Repository = "https://github.com/AyushJaiswal18/DocuAI"
+Issues = "https://github.com/AyushJaiswal18/DocuAI/issues"
 
 [project.optional-dependencies]
 dev = [

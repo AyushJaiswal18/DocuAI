@@ -26,6 +26,7 @@ def cleanup_repo(path: str):
 def get_repo_files(path: str) -> Generator[str, None, None]:
     """
     Yields all supported file paths in the repository.
+    Recursively traverses all subdirectories.
     """
     ignore_dirs = {".git", ".venv", "venv", "node_modules", "__pycache__", "dist", "build", ".idea", ".vscode"}
     
@@ -34,5 +35,5 @@ def get_repo_files(path: str) -> Generator[str, None, None]:
         dirs[:] = [d for d in dirs if d not in ignore_dirs]
         
         for file in files:
-            if file.endswith(".py") or file.endswith(".js"):
+            if file.endswith((".py", ".js", ".ts", ".tsx", ".jsx")):
                 yield os.path.join(root, file)
