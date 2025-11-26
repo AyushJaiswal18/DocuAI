@@ -16,11 +16,11 @@ class DocuAIAgent:
                 "3. Set it in your shell profile (~/.bashrc, ~/.zshrc, etc.)"
             )
         
-        self.llm = ChatOpenAI(model="gpt-5", temperature=0)
+        self.llm = ChatOpenAI(model="gpt-4o", temperature=0.3)
         
         self.doc_prompt = ChatPromptTemplate.from_template(
             """
-            You are an expert software engineer. Generate comprehensive documentation for the following code.
+            You are an expert software engineer and technical writer. Generate comprehensive, professional documentation for the following code.
             
             File: {file_path}
             
@@ -28,33 +28,92 @@ class DocuAIAgent:
             {structure}
             
             Source Code:
+            ```
             {code}
+            ```
             
-            Please provide:
-            1. A high-level summary of what this file does.
-            2. Detailed documentation for each class and function.
-            3. Usage examples if applicable.
+            Generate documentation following this structure:
             
-            Output in Markdown format.
+            # {file_path}
+            
+            ## Overview
+            Provide a clear, concise summary of what this file does and its purpose in the project.
+            
+            ## Components
+            
+            For each class and function:
+            - **Name and Signature**: Include full signature with types
+            - **Purpose**: What it does in 1-2 sentences
+            - **Parameters**: Describe each parameter with type and purpose
+            - **Returns**: What it returns and when
+            - **Example Usage**: Provide realistic code examples
+            - **Notes**: Any important details, edge cases, or gotchas
+            
+            ## Usage Examples
+            
+            Provide 2-3 realistic examples showing:
+            1. Basic usage
+            2. Common use case
+            3. Advanced usage (if applicable)
+            
+            Use proper code formatting with language-specific syntax highlighting.
+            Be specific, accurate, and helpful. Avoid generic statements.
             """
         )
         
         self.smell_prompt = ChatPromptTemplate.from_template(
             """
-            You are an expert code reviewer. Analyze the following code for code smells, anti-patterns, and potential bugs.
+            You are a senior code reviewer and software architect. Perform a thorough code quality analysis.
             
             File: {file_path}
             
             Source Code:
+            ```
             {code}
+            ```
             
-            Identify:
-            1. Code Smells (e.g., long functions, duplicated code, tight coupling).
-            2. Security Vulnerabilities.
-            3. Performance Issues.
-            4. Suggestions for improvement.
+            Analyze the code and provide a structured report:
             
-            Output in Markdown format.
+            # Code Quality Analysis: {file_path}
+            
+            ## Summary
+            Brief overview of overall code quality (1-2 sentences).
+            
+            ## Issues Found
+            
+            ### 🔴 Critical Issues
+            List any critical problems (security vulnerabilities, major bugs, data loss risks):
+            - **Issue**: Description
+            - **Impact**: What could go wrong
+            - **Fix**: Specific solution
+            
+            ### 🟡 Code Smells
+            Identify anti-patterns and design issues:
+            - **Smell**: Name and description
+            - **Location**: Where in the code
+            - **Refactoring**: How to improve
+            
+            ### 🟢 Performance Concerns
+            Note any performance issues:
+            - **Issue**: Description
+            - **Impact**: Performance impact
+            - **Optimization**: Suggested improvement
+            
+            ## Best Practices Violations
+            List any violations of language-specific best practices.
+            
+            ## Recommendations
+            
+            Prioritized list of improvements:
+            1. **High Priority**: Critical fixes
+            2. **Medium Priority**: Important improvements
+            3. **Low Priority**: Nice-to-have enhancements
+            
+            ## Positive Aspects
+            Highlight what's done well (good patterns, clean code, etc.).
+            
+            Be specific with line numbers or code snippets when possible.
+            Provide actionable, concrete suggestions.
             """
         )
 
@@ -98,18 +157,60 @@ class DocuAIAgent:
 
         prompt = ChatPromptTemplate.from_template(
             """
-            You are an expert software engineer. Generate comprehensive documentation for the following repository.
+            You are a senior software architect and technical writer. Generate comprehensive project documentation.
             
             Repository Content:
             {repo_content}
             
-            Please provide:
-            1. A high-level overview of the project.
-            2. Architecture and design patterns used.
-            3. Detailed documentation for key modules and files.
-            4. Usage examples and workflows.
+            Create a professional project documentation following this structure:
             
-            Output in Markdown format.
+            # Project Documentation
+            
+            ## Executive Summary
+            - **Purpose**: What problem does this project solve?
+            - **Key Features**: Top 3-5 features
+            - **Tech Stack**: Main technologies used
+            
+            ## Architecture Overview
+            
+            ### System Design
+            Describe the overall architecture (e.g., MVC, microservices, layered architecture).
+            
+            ### Key Components
+            List and describe major modules/packages:
+            - **Component Name**: Purpose and responsibilities
+            - **Dependencies**: What it depends on
+            - **Interactions**: How it communicates with other components
+            
+            ### Data Flow
+            Explain how data moves through the system.
+            
+            ## Module Documentation
+            
+            For each significant file/module:
+            ### [Module Name]
+            - **Purpose**: What it does
+            - **Key Classes/Functions**: Main functionality
+            - **Usage**: How to use it
+            
+            ## Getting Started
+            
+            ### Prerequisites
+            List required dependencies and setup.
+            
+            ### Quick Start
+            Provide step-by-step usage examples.
+            
+            ## API Reference (if applicable)
+            Document public APIs, endpoints, or interfaces.
+            
+            ## Design Patterns
+            Identify and explain design patterns used.
+            
+            ## Best Practices
+            Highlight good practices implemented in the codebase.
+            
+            Be thorough but concise. Focus on what developers need to know.
             """
         )
         
@@ -128,18 +229,86 @@ class DocuAIAgent:
 
         prompt = ChatPromptTemplate.from_template(
             """
-            You are an expert code reviewer. Analyze the following repository for code smells, anti-patterns, and potential bugs.
+            You are a senior software architect and security expert. Perform a comprehensive project-wide code review.
             
             Repository Content:
             {repo_content}
             
-            Identify:
-            1. Global Code Smells and Architectural Issues.
-            2. Security Vulnerabilities across the project.
-            3. Performance Issues.
-            4. Suggestions for improvement and refactoring.
+            Generate a detailed analysis report:
             
-            Output in Markdown format.
+            # Project Code Quality Report
+            
+            ## Executive Summary
+            - **Overall Quality Score**: Rate 1-10 with justification
+            - **Critical Issues**: Count of critical problems
+            - **Main Concerns**: Top 3 areas needing attention
+            
+            ## Architectural Analysis
+            
+            ### Design Quality
+            - **Strengths**: What's well-designed
+            - **Weaknesses**: Architectural problems
+            - **Suggestions**: How to improve structure
+            
+            ### Code Organization
+            - **Modularity**: How well code is organized
+            - **Coupling**: Dependencies between modules
+            - **Cohesion**: How focused each module is
+            
+            ## Security Analysis
+            
+            ### 🔴 Critical Security Issues
+            List vulnerabilities that need immediate attention:
+            - **Vulnerability**: Type and description
+            - **Location**: Which files/modules
+            - **Risk**: Potential impact
+            - **Fix**: Remediation steps
+            
+            ### Security Best Practices
+            Evaluate adherence to security standards.
+            
+            ## Code Quality Issues
+            
+            ### Patterns and Anti-Patterns
+            - **Good Patterns**: Design patterns used well
+            - **Anti-Patterns**: Problematic patterns found
+            
+            ### Code Smells by Category
+            - **Duplication**: Repeated code
+            - **Complexity**: Overly complex functions/classes
+            - **Naming**: Unclear or inconsistent names
+            - **Error Handling**: Missing or poor error handling
+            
+            ## Performance Analysis
+            - **Bottlenecks**: Potential performance issues
+            - **Optimizations**: Suggested improvements
+            - **Scalability**: How well it will scale
+            
+            ## Testing and Quality Assurance
+            - **Test Coverage**: Assess testing (if tests exist)
+            - **Missing Tests**: Critical areas lacking tests
+            - **Test Quality**: Quality of existing tests
+            
+            ## Maintainability
+            - **Documentation**: Code comments and docs
+            - **Readability**: How easy to understand
+            - **Extensibility**: How easy to extend
+            
+            ## Recommendations
+            
+            ### Immediate Actions (High Priority)
+            1. Critical fixes needed now
+            
+            ### Short-term Improvements (Medium Priority)
+            2. Important refactoring and improvements
+            
+            ### Long-term Enhancements (Low Priority)
+            3. Nice-to-have improvements
+            
+            ## Positive Highlights
+            Recognize what's done exceptionally well.
+            
+            Be specific, actionable, and constructive. Provide code examples where helpful.
             """
         )
         

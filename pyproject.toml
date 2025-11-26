@@ -1,6 +1,6 @@
 [project]
 name = "docuai"
-version = "0.2.1"
+version = "0.3.1"
 description = "AI-powered code documentation generator"
 readme = "README.md"
 license = {text = "MIT"}
